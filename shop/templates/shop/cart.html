@@ -1,0 +1,94 @@
+{% extends 'shop/main.html' %} {% load static %} {% block content %}
+
+<div class="col-span-12 pt-5">
+    <div>
+
+        <!-- Checkout, back buttons and total -->
+
+        <div class="shadow-xl bg-gray-50 rounded-md p-5">
+            <a class="text-center bg-gradient-to-r from-gray-700 via-blue-800 to-blue-900 hover:from-blue-900 hover:via-blue-700 hover:to-blue-900 text-white font-semibold px-6 py-3 rounded-md shadow-lg" href="{% url 'shop' %}">
+                &#x2190; Continue Shopping
+            </a>
+
+            <br/>
+            <br/>
+
+            <div class="grid lg:grid-cols-5 grid-cols-3">
+                <h5 class="font-bold py-2">Items: <span>{{order.get_cart_items}}</span></h5>
+                <h5 class="font-bold py-2">Total: <span>${{order.get_cart_total|floatformat:2}}</span></h5>
+                <div class="hidden lg:block"></div>
+                <div class="hidden lg:block"></div>
+                <a class="text-center bg-gradient-to-r from-gray-700 via-blue-800 to-blue-900 hover:from-blue-900 hover:via-blue-700 hover:to-blue-900 text-white font-semibold lg:mx-5 px-6 py-3 rounded-md shadow-lg" href="{% url 'checkout' %}">
+                    Plateste si dormi
+                </a>
+            </div>
+        </div>
+
+        <br/>
+
+        <div class="shadow-xl bg-gray-50 rounded-md p-5">
+
+            <!-- Table header -->
+
+            <div class="grid grid-cols-5 gap-10">
+                <div class="col-span-2 font-bold">Item</div>
+                <div class="font-bold">Price</div>
+                <div class="font-bold">Quantity</div>
+                <div class="font-bold">Total</div>
+            </div>
+
+            <hr/>
+            <br/>
+
+            <!-- Cart items -->
+
+            {% if cart_products > 0 %}
+            {% for item in items %}
+            <div class="grid grid-cols-5 gap-10">
+                <div><img src="{{item.product.image1URL}}"/></div>
+                <div><p>{{item.product.name}}</p></div>
+                <div>
+                
+                {% if item.product.discount %}
+
+                <p class="text-red-700 text-center">
+                    <strike><strong>${{item.product.price}}</strong></strike>
+                </p>
+
+                <p class="text-center">
+                    <strong>${{item.product.discounted_price}}</strong>
+                </p>
+
+                {% else %}
+
+                <p class="text-center">
+                    <strong>${{item.product.price}}</strong>
+                </p>
+
+                {% endif %}
+
+                </div>
+
+                <div class="grid lg:grid-cols-5 md:grid-cols-5 grid-cols-2">
+                    <p class="mt-1">{{item.quantity}}</p>
+
+                    <div class="">
+                        <img data-product="{{item.product.id}}" data-action="add" class="w-3 mb-4 cart-action" src="{% static  'website_images/arrow-up.png' %}"/>
+                        <img data-product="{{item.product.id}}" data-action="remove" class="w-3 cart-action" src="{% static  'website_images/arrow-down.png' %}"/>
+                    </div>
+                </div>
+
+                <div><p>${{item.get_total|floatformat:2}}</p></div>
+            </div>
+            <br/>
+            {% endfor %}
+            {% else %}
+            <div class="w-full text-center my-24 text-3xl font-bold">
+                <p>Your cart is currently empty.</p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+{% endblock content%}

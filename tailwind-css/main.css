@@ -1,0 +1,77 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Filter checkboxes */
+
+input:checked+div {
+    @apply border-blue-700;
+}
+
+input:checked+div svg {
+    @apply block;
+}
+
+input[type='checkbox'] {
+    display: none;
+}
+
+
+/* gallery */
+
+.gallery-open:checked+.gallery-item {
+    position: static;
+    opacity: 100;
+}
+
+.gallery-item {
+    -webkit-transition: opacity 0.6s ease-out;
+    transition: opacity 0.6s ease-out;
+}
+
+#gallery-1:checked~.control-1,
+#gallery-2:checked~.control-2,
+#gallery-3:checked~.control-3 {
+    display: block;
+}
+
+.gallery-indicators {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    position: absolute;
+    bottom: 2%;
+    left: 0;
+    right: 0;
+    text-align: center;
+    z-index: 10;
+}
+
+#gallery-1:checked~.control-1~.gallery-indicators li:nth-child(1) .gallery-bullet,
+#gallery-2:checked~.control-2~.gallery-indicators li:nth-child(2) .gallery-bullet,
+#gallery-3:checked~.control-3~.gallery-indicators li:nth-child(3) .gallery-bullet {
+    @apply text-blue-700;
+}
+
+
+/* Custom Scrollbar */
+
+::-webkit-scrollbar {
+    width: 18px;
+    height: 18px;
+}
+
+::-webkit-scrollbar-track {
+    border-radius: 100vh;
+    background: #F4F2F7;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #D3D3D3;
+    border-radius: 100vh;
+    border: 3px solid #F4F2F7;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #9BA4BB;
+}

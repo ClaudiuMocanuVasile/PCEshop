@@ -1,0 +1,95 @@
+{% extends 'shop/main.html' %} {% load static %} {% block content %}
+
+<style>
+    footer {
+        display: none;
+    }
+
+    header {
+        display: none;
+    }
+</style>
+
+<form method="POST" action="" class="-mx-4 -mb-6">
+    {%csrf_token%}
+    <a class="absolute mt-5 bg-gray-200 text-center bg-gradient-to-r from-gray-700 via-blue-800 to-blue-900 hover:from-blue-900 hover:via-blue-700 hover:to-blue-900 text-white font-semibold px-6 py-3 rounded-md shadow-lg" href="{% url 'shop' %}">
+        &#x2190; Continue Shopping
+    </a>    
+    <div class="min-h-screen bg-gray-200 text-gray-800 px-4 py-6 flex flex-col justify-center sm:py-12">
+        <div class="py-3 sm:max-w-xl mx-auto text-center">
+            <span class="text-2xl">Register</span>
+            <div class="mt-4 bg-white shadow-md sm:rounded-lg text-left">
+                <div class="h-2 bg-gradient-to-r from-gray-800 via-gray-800 to-blue-900 rounded-t-md"></div>
+                <div class="py-6 px-8 grid grid-cols-2 gap-x-5">
+                    <div>
+                        <label class="block mt-3 font-semibold">{{register_form.username.label}}</label>
+                        {{register_form.username}}
+                    </div>
+                    <div>
+                        <label class="block mt-3 font-semibold">{{register_form.email.label}}</label>
+                        {{register_form.email}}
+                    </div>
+                    <div>
+                        <label class="block mt-3 font-semibold">{{register_form.first_name.label}}</label>
+                        {{register_form.first_name}}
+                    </div>
+                    <div>
+                        <label class="block mt-3 font-semibold">{{register_form.last_name.label}}</label>
+                        {{register_form.last_name}}
+                    </div>
+                    <div>
+                        <label class="block mt-3 font-semibold">{{register_form.address.label}}</label>
+                        {{register_form.address}}
+                    </div>
+                    <div>
+                        <label class="block mt-3 font-semibold">{{register_form.city.label}}</label>
+                        {{register_form.city}}
+                    </div>
+                    <div>
+                        <label class="block mt-3 font-semibold">{{register_form.county.label}}</label>
+                        {{register_form.county}}
+                    </div>
+                    <div>
+                        <label class="block mt-3 font-semibold">{{register_form.zipcode.label}}</label>
+                        {{register_form.zipcode}}
+                    </div>
+                    <div>
+                        <label class="block mt-3 font-semibold">Password</label>
+                        {{register_form.password1}}
+                    </div>
+                    <div>
+                        <label class="block mt-3 font-semibold">Confirm password</label>
+                        {{register_form.password2}}
+                    </div>
+                    <div class="col-span-2 mt-2 text-gray-800">
+                        <ul>
+                            <li>
+                                Your password should be at least 8 characters long.
+                            </li>
+                            <li>Your password cannot be entirely numeric.</li>
+                            <li>
+                                Your password cannot be a commonly used password.
+                            </li>
+                            <li>
+                                Your password shouldn't be too similar to your personal information.
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="flex justify-between items-baseline col-span-2 mt-5">
+                        <input type="submit" value="Register" class="w-full bg-gradient-to-r from-gray-700 via-blue-800 to-blue-900 hover:from-blue-900 hover:via-blue-700 hover:to-blue-900 text-white font-semibold px-6 py-3 rounded-md shadow-lg"/>
+                    </div>
+                </div>
+            </div>
+            {% if register_form.errors %}
+            <ul style="list-style-type: none; color: red;">
+                {% for error in register_form.errors.values %}
+                <li><strong>{{ error }}</strong></li>
+                {% endfor %}
+            </ul>
+            {% endif %}
+            <a href="{% url 'login_page' %}" class="text-gray-500 text-sm hover:underline">Already have an account? Log in</a>
+        </div>
+    </div>
+</form>
+
+{% endblock content %}

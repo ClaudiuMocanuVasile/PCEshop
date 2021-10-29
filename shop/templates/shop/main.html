@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="en">
+    <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1" />
+        <link rel="shortcut icon" href="{% static 'website_images/favicon.png'%}" type="image/x-icon" />
+        <link rel="stylesheet" type="text/css" href="{% static 'css/main.css' %}" />
+
+        <title>PC E-shop</title>
+
+        <script type="text/javascript">
+            var user = "{{request.user}}";
+
+            // CSRF token
+
+            function getCSRFToken(name) {
+                let cookieValue = null;
+                if (document.cookie && document.cookie !== "") {
+                    const cookies = document.cookie.split(";");
+                    for (let i = 0; i < cookies.length; i++) {
+                        const cookie = cookies[i].trim();
+
+                        if (cookie.substring(0, name.length + 1) === name + "=") {
+                            cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                            break;
+                        }
+                    }
+                }
+                return cookieValue;
+            }
+            var csrftoken = getCSRFToken("csrftoken");
+
+            // Cart cookies for guest users
+
+            function getCookie(name) {
+                var cookieArr = document.cookie.split(";");
+
+                for (var i = 0; i < cookieArr.length; i++) {
+                    var cookiePair = cookieArr[i].split("=");
+
+                    if (name == cookiePair[0].trim()) {
+                        return decodeURIComponent(cookiePair[1]);
+                    }
+                }
+
+                return null;
+            }
+            var cart = JSON.parse(getCookie("cart"));
+
+            if (cart == undefined) {
+                cart = {};
+                console.log("Cart was created.");
+                document.cookie = "cart=" + JSON.stringify(cart) + ";domain=;path=/";
+            }
+        </script>
+    </head>
+
+    <body class="bg-gray-200">
+
+        <!-- Logo, menu, cart icon -->
+
+        <header>
+            <nav class="flex flex-wrap items-center justify-between bg-gradient-to-r from-gray-800 via-gray-800 to-blue-900">
+                <img src="{%static 'website_images/logo2.png' %}" alt="logo" width="140" />
+
+                <div class="flex md:hidden">
+                    {% if request.user.is_authenticated %}
+                    <span class="text-gray-50 m-auto font-semibold mr-2">Hello, {{request.user.customer.first_name}}</span>&nbsp;
+                    <span class="m-auto mr-5 md:block mt-2">
+                        <a href="{% url 'profile_page' %}" class="m-auto underline hover:text-gray-400">
+                            <svg height="40" fill="white" viewBox="0 0 512 512" width="40">
+                                <path
+                                    d="m437.019531 74.980469c-48.351562-48.351563-112.640625-74.980469-181.019531-74.980469-68.382812 0-132.667969 26.628906-181.019531 74.980469-48.351563 48.351562-74.980469 112.636719-74.980469 181.019531 0 68.378906 26.628906 132.667969 74.980469 181.019531 48.351562 48.351563 112.636719 74.980469 181.019531 74.980469 68.378906 0 132.667969-26.628906 181.019531-74.980469 48.351563-48.351562 74.980469-112.640625 74.980469-181.019531 0-68.382812-26.628906-132.667969-74.980469-181.019531zm-308.679687 367.40625c10.707031-61.648438 64.128906-107.121094 127.660156-107.121094 63.535156 0 116.953125 45.472656 127.660156 107.121094-36.347656 24.972656-80.324218 39.613281-127.660156 39.613281s-91.3125-14.640625-127.660156-39.613281zm46.261718-218.519531c0-44.886719 36.515626-81.398438 81.398438-81.398438s81.398438 36.515625 81.398438 81.398438c0 44.882812-36.515626 81.398437-81.398438 81.398437s-81.398438-36.515625-81.398438-81.398437zm235.042969 197.710937c-8.074219-28.699219-24.109375-54.738281-46.585937-75.078125-13.789063-12.480469-29.484375-22.328125-46.359375-29.269531 30.5-19.894531 50.703125-54.3125 50.703125-93.363281 0-61.425782-49.976563-111.398438-111.402344-111.398438s-111.398438 49.972656-111.398438 111.398438c0 39.050781 20.203126 73.46875 50.699219 93.363281-16.871093 6.941406-32.570312 16.785156-46.359375 29.265625-22.472656 20.339844-38.511718 46.378906-46.585937 75.078125-44.472657-41.300781-72.355469-100.238281-72.355469-165.574219 0-124.617188 101.382812-226 226-226s226 101.382812 226 226c0 65.339844-27.882812 124.277344-72.355469 165.578125zm0 0"
+                                />
+                            </svg>
+                        </a>
+                    </span>
+                    {% endif %}
+                    <button id="hamburger">
+                        <img class="toggle block" src="{% static 'website_images/hamburger1.png' %}" width="40" height="40" />
+                        <img class="toggle hidden" src="{% static 'website_images/hamburger2.png' %}" width="40" height="40" />
+                    </button>
+                </div>
+
+                <div class="toggle hidden md:flex w-full md:w-auto text-center font-semibold mt-5 md:mt-0 border-t-2 border-gray-300 md:border-none md:mr-auto text-xl">
+                    <a href="{% url 'shop' %}" class="font-bold block md:inline-block text-gray-50 hover:text-gray-400 px-3 text-xl py-3 border-b-2 border-gray-300 md:border-none">Shop</a>
+                </div>
+
+                <div class="toggle hidden flex flex-wrap items-center justify-between py-3 md:flex w-full md:w-auto px-3">
+                    {% if not request.user.is_authenticated %}
+                    <a href="{% url 'login_page' %}" class="mr-10 bg-gradient-to-r from-gray-400 via-gray-300 to-gray-400 hover:from-gray-400 hover:via-gray-200 hover:to-gray-400 font-bold px-6 py-3 rounded-md shadow-lg">Login</a>
+                    {% elif request.user.is_authenticated %}
+                    <span class="toggle md:block block m-auto font-semibold text-white mr-2">Hello, {{request.user.customer.first_name}}</span>&nbsp;
+                    <span class="m-auto mr-5 toggle block md:block mt-2">
+                        <a href="{% url 'profile_page' %}" class="md:block toggle block m-auto underline hover:text-blue-700">
+                            <svg class="md:block toggle block" height="40" fill="white" viewBox="0 0 512 512" width="40">
+                                <path
+                                    class="md:block toggle block"
+                                    d="m437.019531 74.980469c-48.351562-48.351563-112.640625-74.980469-181.019531-74.980469-68.382812 0-132.667969 26.628906-181.019531 74.980469-48.351563 48.351562-74.980469 112.636719-74.980469 181.019531 0 68.378906 26.628906 132.667969 74.980469 181.019531 48.351562 48.351563 112.636719 74.980469 181.019531 74.980469 68.378906 0 132.667969-26.628906 181.019531-74.980469 48.351563-48.351562 74.980469-112.640625 74.980469-181.019531 0-68.382812-26.628906-132.667969-74.980469-181.019531zm-308.679687 367.40625c10.707031-61.648438 64.128906-107.121094 127.660156-107.121094 63.535156 0 116.953125 45.472656 127.660156 107.121094-36.347656 24.972656-80.324218 39.613281-127.660156 39.613281s-91.3125-14.640625-127.660156-39.613281zm46.261718-218.519531c0-44.886719 36.515626-81.398438 81.398438-81.398438s81.398438 36.515625 81.398438 81.398438c0 44.882812-36.515626 81.398437-81.398438 81.398437s-81.398438-36.515625-81.398438-81.398437zm235.042969 197.710937c-8.074219-28.699219-24.109375-54.738281-46.585937-75.078125-13.789063-12.480469-29.484375-22.328125-46.359375-29.269531 30.5-19.894531 50.703125-54.3125 50.703125-93.363281 0-61.425782-49.976563-111.398438-111.402344-111.398438s-111.398438 49.972656-111.398438 111.398438c0 39.050781 20.203126 73.46875 50.699219 93.363281-16.871093 6.941406-32.570312 16.785156-46.359375 29.265625-22.472656 20.339844-38.511718 46.378906-46.585937 75.078125-44.472657-41.300781-72.355469-100.238281-72.355469-165.574219 0-124.617188 101.382812-226 226-226s226 101.382812 226 226c0 65.339844-27.882812 124.277344-72.355469 165.578125zm0 0"
+                                />
+                            </svg>
+                        </a>
+                    </span>
+                    <span class="mr-auto md:mr-10">
+                        <a href="{% url 'logout' %}" class="bg-gradient-to-r from-red-800 via-red-700 to-red-800 hover:from-red-800 hover:via-red-600 hover:to-red-800 text-white font-bold px-6 py-3 rounded-md shadow-lg">Logout</a>
+                    </span>
+                    {% endif %}
+                    <a href="{% url 'cart' %}">
+                        <span class="relative inline-block right-2">
+                            <img src="{% static 'website_images/cart2.png' %}" class="w-12" />
+                            <span class="absolute top-2 right-2 inline-flex items-center justify-center px-2 py-1 text-xs font-bold leading-none text-red-100 transform translate-x-1/2 -translate-y-1/2 bg-red-600 rounded-full">
+                                {{cart_products}}
+                            </span>
+                        </span>
+                    </a>
+                </div>
+            </nav>
+        </header>
+
+        <!-- In main.html -->
+
+        <main>
+            <div class="container mx-auto px-4 bg-gradient-to-r from-gray-400 via-gray-300 to-gray-400 pb-5 min-h-screen">
+                <hr />
+                {% block content %} {% endblock content %}
+            </div>
+        </main>
+
+        <!-- Footer -->
+
+        <footer>
+            <div class="grid grid-cols-1 bg-gradient-to-r from-gray-700 to-gray-800 py-5 text-white text-md place-items-center">
+                <div class="grid lg:grid-cols-4 grid-cols-2 gap-y-10 mb-4 mt-5 sm:gap-x-5 gap-x-8">
+                    <div class="text-center m-auto">
+                        <img src="{%static 'website_images/logo2.png' %}" alt="logo" width="200" class="m-auto" />
+                        <p>The customer is our king.</p>
+                    </div>
+
+                    <div class="place-items-center mt-3">
+                        <div class="grid grid-cols-1 place-items-center sm:gap-y-0 gap-y-2">
+                            <span class="sm:mb-5"> Newsletter: </span>
+                            <form method="POST" action="" class="grid grid-cols-6 gap-x-2 sm:gap-y-0 gap-y-2">
+                                <input type="text" placeholder="Email" class="text-black sm:col-span-4 col-span-6 border w-full h-5 px-2 py-4 hover:outline-none focus:outline-none focus:ring-1 focus:ring-indigo-600 rounded-md" />
+                                <input
+                                    type="submit"
+                                    class="cursor-pointer col-span-6 sm:col-span-2 bg-gradient-to-r from-gray-700 via-blue-800 to-blue-900 hover:from-blue-900 hover:via-blue-700 hover:to-blue-900 text-white font-semibold rounded-md shadow-lg"
+                                />
+                            </form>
+                        </div>
+                    </div>
+
+                    <div class="text-center m-auto">
+                        <p class="text-md mb-3">Information</p>
+
+                        <a href="{% url 'privacy_policy' %}" class="mb-1 text-sm">
+                            Privacy policy
+                        </a>
+                        <br />
+                        <a href="{% url 'cookie_policy' %}" class="mb-1 text-sm">
+                            Cookie policy
+                        </a>
+                    </div>
+
+                    <div class="text-center m-auto">
+                        <p class="mb-3">Contact information</p>
+                        <address class="text-sm">
+                            <p class="mb-1">Mocanu-Vasile Claudiu</p>
+                            <p class="mb-1">
+                                Email:
+                                <a href="mailto:m.v.claudiu99@gmail.com">m.v.claudiu99@gmail.com</a>
+                            </p>
+                            <p class="mb-1">
+                                Phone number:
+                                <a href="tel:+40765099203">(+40) 765 099 203</a>
+                            </p>
+                        </address>
+                    </div>
+                </div>
+
+                <p class="text-center text-sm">
+                    &copy; Copyright 2021. Design by Mocanu-Vasile Claudiu
+                </p>
+            </div>
+        </footer>
+    </body>
+
+    <!-- Hamburger menu toggle -->
+
+    <script type="text/javascript" src="{% static 'js/cart.js' %}"></script>
+
+    <script>
+        document.getElementById("hamburger").onclick = function toggleMenu() {
+            const navToggle = document.getElementsByClassName("toggle");
+            for (let i = 0; i < navToggle.length; i++) {
+                navToggle.item(i).classList.toggle("hidden");
+            }
+        };
+    </script>
+</html>

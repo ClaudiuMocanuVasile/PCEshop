@@ -1,0 +1,159 @@
+{% extends 'shop/main.html' %} {% load static %} {% block content %}
+
+<div class="grid grid-cols-1 w-full text-lg font-bold lg:mb-20 px-6 pt-5">
+    <div class="text-center lg:col-span-2 mb-20 mt-10 text-3xl">
+        <h3>
+            {{product.name}}, {{product.processor_manufacturer}} 
+            {{product.processor_type}} {{product.processor_model}}, 
+            {{product.ram_memory}}GB {{product.ram_type}} RAM, 
+            {% if product.storage|length == 4 %} 
+            {{product.storage.0}} TB 
+            {% else %} 
+            {{product.storage}} GB 
+            {% endif %} {{product.storage_type}}, 
+            {% if product.gpu == "Dedicated" %} {{product.gpu_manufacturer}} {{product.gpu_model}} {% endif %}
+        </h3>
+    </div>
+
+    <div class="grid lg:grid-cols-2 grid-cols-1 bg-white mb-8 lg:mb-0 px-10 rounded-xl">
+        <div class="m-auto gallery relative rounded overflow-hidden bg-gray-0">
+            <div class="gallery-inner relative overflow-hidden w-full">
+                <input class="gallery-open" type="radio" id="gallery-1" name="gallery" aria-hidden="true" hidden="" checked="checked" />
+                <div class="gallery-item absolute opacity-0 bg-center">
+                    <img src="{% static 'images/'%}{{product.image}}" />
+                </div>
+                <label class="control-1"></label>
+
+                <input class="gallery-open" type="radio" id="gallery-2" name="gallery" aria-hidden="true" hidden="" checked="checked" />
+                <div class="gallery-item absolute opacity-0 bg-center">
+                    <img src="{% static 'images/'%}{{product.image2}}" />
+                </div>
+                <label class="control-2"></label>
+
+                <input class="gallery-open" type="radio" id="gallery-3" name="gallery" aria-hidden="true" hidden="" checked="checked" />
+                <div class="gallery-item absolute opacity-0 bg-center">
+                    <img src="{% static 'images/'%}{{product.image3}}" />
+                </div>
+                <label class="control-3"></label>
+
+                <ol class="gallery-indicators">
+                    <li class="inline-block mr-3">
+                        <label for="gallery-1" class="gallery-bullet cursor-pointer block text-4xl text-white hover:text-blue-700">•</label>
+                    </li>
+                    <li class="inline-block mr-3">
+                        <label for="gallery-2" class="gallery-bullet cursor-pointer block text-4xl text-white hover:text-blue-700">•</label>
+                    </li>
+                    <li class="inline-block mr-3">
+                        <label for="gallery-3" class="gallery-bullet cursor-pointer block text-4xl text-white hover:text-blue-700">•</label>
+                    </li>
+                </ol>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-2 lg:gap-y-10 gap-y-10 gap-x-10 bg-white py-5">
+            <h3 class="text-2xl mx-auto col-span-2">Hardware specifications</h3>
+            <p>
+                Processor manufacturer:&nbsp;&nbsp;&nbsp;
+                <span class="font-medium"> {{product.processor_manufacturer}}</span>
+            </p>
+            <p>
+                Processor:&nbsp;&nbsp;&nbsp;
+                <span class="font-medium"> {{product.processor_type}} {{product.processor_model}}</span>
+            </p>
+            <p>
+                RAM memory:&nbsp;&nbsp;&nbsp;
+                <span class="font-medium"> {{product.ram_memory}}GB {{product.ram_type}}</span>
+            </p>
+            <p>
+                RAM frequency:&nbsp;&nbsp;&nbsp;
+                <span class="font-medium"> {{product.ram_frequency}}MHz</span>
+            </p>
+            <p>
+                Storage type:&nbsp;&nbsp;&nbsp;
+                <span class="font-medium"> {{product.storage_type}}</span>
+            </p>
+            <p>
+                Storage capacity:&nbsp;&nbsp;&nbsp;
+                <span class="font-medium"> {% if product.storage|length < 4 %} {{product.storage}} GB {% else %} {{product.storage.0}}TB {% endif %}</span>
+            </p>
+            {% if product.gpu == "Dedicated" %}
+            <p>
+                Dedicated GPU:&nbsp;&nbsp;&nbsp;
+                <span class="font-medium"> Yes</span>
+            </p>
+            <p>
+                GPU:&nbsp;&nbsp;&nbsp;<span class="font-medium"> {{product.gpu_manufacturer}} {{product.gpu_model}}</span>
+            </p>
+            {% else %}
+            <p class="col-span-2 mr-auto">
+                Dedicated GPU:&nbsp;&nbsp;&nbsp;
+                <span class="font-medium"> No </span>
+            </p>
+            {% endif %}
+
+            <div class="grid grid-cols-2">
+                <p class="font-bold text-2xl my-auto">Price:</p>
+                <div class="my-auto mr-auto">
+                    {% if product.discount != 0 %}
+                    <h4 class="text-lg block text-red-700 text-center">
+                        <strike><strong>${{product.price|floatformat:2}}</strong></strike>
+                    </h4>
+                    <h4 class="text-lg block text-center">
+                        <strong>${{product.discounted_price|floatformat:2}}</strong>
+                    </h4>
+                    {% else %}
+                    <h4 class="text-lg block text-center">
+                        <strong>${{product.price|floatformat:2}}</strong>
+                    </h4>
+                    {% endif %}
+                </div>
+            </div>
+
+            <button data-product="{{product.id}}" data-action="add" class="bg-gradient-to-r from-gray-700 via-blue-800 to-blue-900 hover:from-blue-900 hover:via-blue-700 hover:to-blue-900 text-white font-semibold px-6 py-3 rounded-md cart-action shadow-lg">
+                Add to Cart
+            </button>
+        </div>
+    </div>
+</div>
+
+<script>
+    setTimeout(() => {
+        document.getElementById("gallery-1").checked = true;
+        document.getElementById("gallery-2").checked = false;
+        document.getElementById("gallery-3").checked = false;
+    }, 0);
+
+    setTimeout(() => {
+        document.getElementById("gallery-1").checked = false;
+        document.getElementById("gallery-2").checked = true;
+        document.getElementById("gallery-3").checked = false;
+    }, 5000);
+
+    setTimeout(() => {
+        document.getElementById("gallery-1").checked = false;
+        document.getElementById("gallery-2").checked = false;
+        document.getElementById("gallery-3").checked = true;
+    }, 10000);
+
+    setInterval(() => {
+        setTimeout(() => {
+            document.getElementById("gallery-1").checked = true;
+            document.getElementById("gallery-2").checked = false;
+            document.getElementById("gallery-3").checked = false;
+        }, 5000);
+
+        setTimeout(() => {
+            document.getElementById("gallery-1").checked = false;
+            document.getElementById("gallery-2").checked = true;
+            document.getElementById("gallery-3").checked = false;
+        }, 10000);
+
+        setTimeout(() => {
+            document.getElementById("gallery-1").checked = false;
+            document.getElementById("gallery-2").checked = false;
+            document.getElementById("gallery-3").checked = true;
+        }, 15000);
+    }, 15000);
+</script>
+
+{% endblock content %}

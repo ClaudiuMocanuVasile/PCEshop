@@ -1,0 +1,1 @@
+web: gunicorn PCEshop.wsgi --log-file -

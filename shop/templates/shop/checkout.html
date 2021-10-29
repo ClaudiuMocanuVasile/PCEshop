@@ -1,0 +1,399 @@
+{% extends 'shop/main.html' %} {% load static %} {% block content %}
+
+<br/>
+
+{% if not request.user.is_authenticated %}
+
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-2">
+
+    <div>
+
+        <!-- Checkout form -->
+
+        <div class="shadow-xl bg-gray-50 rounded-md p-5" id="form-container">
+
+            <!-- User data -->
+
+            <form id="form" class="grid grid-cols-1 gap-x-10 gap-y-5">
+                {% csrf_token %} 
+
+                <div id="user-data" class="grid grid-cols-1 gap-x-10 gap-y-5 mb-5">
+                    <p class="font-bold">Name and email:</p>
+
+                    <hr/>
+                    <div class="grid grid-cols-2 gap-x-10 gap-y-5">
+                        <div>
+                            <label class="block font-semibold text-lg pl-1">Name</label>
+                            <input class="border w-full h-5 px-3 py-5 hover:outline-none focus:outline-none focus:ring-1 focus:ring-indigo-600 rounded-md shadow-md"  value="{{name}}" required type="text" name="name"/>
+                        </div>
+                        <div>
+                            <label class="block font-semibold text-lg pl-1">Email</label>
+                            <input class="border w-full h-5 px-3 py-5 hover:outline-none focus:outline-none focus:ring-1 focus:ring-indigo-600 rounded-md shadow-md"  value="{{request.user.customer.email}}" required type="email" name="email"/>
+                        </div>
+                    </div>
+                </div>
+
+                
+
+                <!-- Shipping -->
+
+                <div id="shipping-info" class="grid grid-cols-1 gap-x-10 gap-y-5">
+                    <p class="font-bold text-lg">Shipping Information:</p>
+
+                    <hr/>
+
+                    <div class="grid grid-cols-2 gap-x-10 gap-y-5">
+                        <div>
+                            <label class="block font-semibold text-lg pl-1">Address</label>
+                            <input class="border w-full h-5 px-3 py-5 hover:outline-none focus:outline-none focus:ring-1 focus:ring-indigo-600 rounded-md shadow-md" value="{{shipping_info.address}}" type="text" name="address"/>
+                        </div>
+                        <div>
+                            <label class="block font-semibold text-lg pl-1">City</label>
+                            <input class="border w-full h-5 px-3 py-5 hover:outline-none focus:outline-none focus:ring-1 focus:ring-indigo-600 rounded-md shadow-md" value="{{shipping_info.city}}" type="text" name="city"/>
+                        </div>
+                        <div>
+                            <label class="block font-semibold text-lg pl-1">County</label>
+                            <input class="border w-full h-5 px-3 py-5 hover:outline-none focus:outline-none focus:ring-1 focus:ring-indigo-600 rounded-md shadow-md" value="{{shipping_info.county}}" type="text" name="county"/>
+                        </div>
+                        <div>
+                            <label class="block font-semibold text-lg pl-1">Zip code</label>
+                            <input class="border w-full h-5 px-3 py-5 hover:outline-none focus:outline-none focus:ring-1 focus:ring-indigo-600 rounded-md shadow-md" value="{{shipping_info.zipcode}}" type="text" name="zipcode"/>
+                        </div>
+                    </div>
+                </div>
+                <hr/>
+
+                <input id="order-submit" class="bg-gradient-to-r from-gray-700 via-blue-800 to-blue-900 hover:from-blue-900 hover:via-blue-700 hover:to-blue-900 text-white font-semibold px-6 py-3 rounded-md cursor-pointer shadow-lg" type="submit" value="Continue" />
+                
+                <br/>
+            </form>
+
+            <!-- Payment -->
+
+            <div class="shadow-xl bg-gray-50 rounded-md p-5 hidden" id="payment-info">
+                <div id="paypal-button-container"></div>
+                <small>Paypal Options</small>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Order summary -->
+
+    <div>
+        <div class="shadow-xl bg-gray-50 rounded-md p-5 float-right w-full">
+            <a class="bg-gradient-to-r from-gray-700 via-blue-800 to-blue-900 hover:from-blue-900 hover:via-blue-700 hover:to-blue-900 text-white font-semibold px-6 py-3 rounded-md shadow-lg" href="{% url 'cart' %}">
+                &#x2190; Back to Cart
+            </a>
+
+            <br/>
+            <br/>
+
+            <div class="grid grid-cols-5">
+                <h3 class="font-bold text-lg col-span-2">Order Summary</h3>
+                <h3 class="font-bold text-lg">Product</h3>
+                <h3 class="font-bold text-lg">Price</h3>
+                <h3 class="font-bold text-lg">Items</h3>
+            </div>
+
+            <hr/>
+            <br/>
+            {% for item in items%}
+            <div class="grid grid-cols-5">
+                <div><img src="{{item.product.image1URL}}"/></div>
+                <div></div>
+                <div><p>{{item.product.name}}</p></div>
+                <div>
+                
+                {% if item.product.discount %}
+
+                <p class="text-red-700 text-center">
+                    <strike><strong>${{item.product.price}}</strong></strike>
+                </p>
+
+                <p class="text-center">
+                    <strong>${{item.product.discounted_price}}</strong>
+                </p>
+
+                {% else %}
+
+                <p class="text-center">
+                    <strong>${{item.product.price}}</strong>
+                </p>
+
+                {% endif %}
+
+                </div>
+                <div><p>x{{item.quantity}}</p></div>
+            </div>
+            <br/>
+            {%endfor%}
+
+            <br/>
+
+            <div class="grid grid-cols-2">
+                <h5 class="font-bold text-lg">Items: <span class="text-lg">{{order.get_cart_items}}</span></h5>
+
+                <div>
+                    <h5 class="float-right font-bold text-lg">
+                        Total:
+                        <span>${{order.get_cart_total|floatformat:2}}</span>
+                    </h5>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+{% else %}
+
+<div class="grid grid-cols-1 lg:grid-cols-1 gap-2">
+
+    <!-- Order summary -->
+
+    <div>
+        <div class="shadow-xl bg-gray-50 rounded-md p-5 float-right w-full">
+            <a class="bg-gradient-to-r from-gray-700 via-blue-800 to-blue-900 hover:from-blue-900 hover:via-blue-700 hover:to-blue-900 text-white font-semibold px-6 py-3 rounded-md shadow-lg" href="{% url 'cart' %}">
+                &#x2190; Back to Cart
+            </a>
+
+            <br/>
+            <br/>
+
+            <div class="grid grid-cols-5">
+                <h3 class="font-bold text-lg col-span-2">Order Summary</h3>
+                <h3 class="font-bold text-lg">Product</h3>
+                <h3 class="font-bold text-lg">Price</h3>
+                <h3 class="font-bold text-lg">Items</h3>
+            </div>
+
+            <hr/>
+            <br/>
+            {% for item in items%}
+            <div class="grid grid-cols-5">
+                <div><img src="{{item.product.image1URL}}"/></div>
+                <div></div>
+                <div><p>{{item.product.name}}</p></div>
+                <div>
+                
+                {% if item.product.discount %}
+
+                <p class="text-red-700 text-center">
+                    <strike><strong>${{item.product.price}}</strong></strike>
+                </p>
+
+                <p class="text-center">
+                    <strong>${{item.product.discounted_price}}</strong>
+                </p>
+
+                {% else %}
+
+                <p class="text-center">
+                    <strong>${{item.product.price}}</strong>
+                </p>
+
+                {% endif %}
+
+                </div>
+                <div><p>x{{item.quantity}}</p></div>
+            </div>
+            <br/>
+            {%endfor%}
+
+            <br/>
+
+            <div class="grid grid-cols-2">
+                <h5 class="font-bold text-lg">Items: <span class="text-lg">{{order.get_cart_items}}</span></h5>
+
+                <div>
+                    <h5 class="float-right font-bold text-lg">
+                        Total:
+                        <span>${{order.get_cart_total|floatformat:2}}</span>
+                    </h5>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Payment -->
+    <form id="form" class="flex justify-center">
+        {% csrf_token %} 
+
+        <div id="user-data" class="grid grid-cols-1 gap-x-10 gap-y-5 mb-5 hidden">
+            <p class="font-bold">Name and email:</p>
+
+            <hr/>
+            <div class="grid grid-cols-2 gap-x-10 gap-y-5">
+                <div>
+                    <label class="block font-semibold text-lg pl-1">Name</label>
+                    <input class="border w-full h-5 px-3 py-5 hover:outline-none focus:outline-none focus:ring-1 focus:ring-indigo-600 rounded-md shadow-md"  value="{{name}}" required type="text" name="name"/>
+                </div>
+                <div>
+                    <label class="block font-semibold text-lg pl-1">Email</label>
+                    <input class="border w-full h-5 px-3 py-5 hover:outline-none focus:outline-none focus:ring-1 focus:ring-indigo-600 rounded-md shadow-md"  value="{{request.user.customer.email}}" required type="email" name="email"/>
+                </div>
+            </div>
+        </div>
+
+    
+
+        <!-- Shipping -->
+
+        <div id="shipping-info" class="grid grid-cols-1 gap-x-10 gap-y-5 hidden">
+            <p class="font-bold text-lg">Shipping Information:</p>
+
+            <hr/>
+
+            <div class="grid grid-cols-2 gap-x-10 gap-y-5">
+                <div>
+                    <label class="block font-semibold text-lg pl-1">Address</label>
+                    <input class="border w-full h-5 px-3 py-5 hover:outline-none focus:outline-none focus:ring-1 focus:ring-indigo-600 rounded-md shadow-md" value="{{shipping_info.address}}" type="text" name="address"/>
+                </div>
+                <div>
+                    <label class="block font-semibold text-lg pl-1">City</label>
+                    <input class="border w-full h-5 px-3 py-5 hover:outline-none focus:outline-none focus:ring-1 focus:ring-indigo-600 rounded-md shadow-md" value="{{shipping_info.city}}" type="text" name="city"/>
+                </div>
+                <div>
+                    <label class="block font-semibold text-lg pl-1">County</label>
+                    <input class="border w-full h-5 px-3 py-5 hover:outline-none focus:outline-none focus:ring-1 focus:ring-indigo-600 rounded-md shadow-md" value="{{shipping_info.county}}" type="text" name="county"/>
+                </div>
+                <div>
+                    <label class="block font-semibold text-lg pl-1">Zip code</label>
+                    <input class="border w-full h-5 px-3 py-5 hover:outline-none focus:outline-none focus:ring-1 focus:ring-indigo-600 rounded-md shadow-md" value="{{shipping_info.zipcode}}" type="text" name="zipcode"/>
+                </div>
+            </div>
+        </div>
+        <hr/>
+
+        <input id="order-submit" class="w-96 bg-gradient-to-r from-gray-700 via-blue-800 to-blue-900 hover:from-blue-900 hover:via-blue-700 hover:to-blue-900 text-white font-semibold px-6 py-3 rounded-md cursor-pointer shadow-lg" type="submit" value="Continue" />
+        
+        <br/>
+    </form>
+    <div class="rounded-md w-full hidden" id="payment-info">
+        <div id="paypal-button-container" class="flex justify-center"></div>
+        <small>Paypal Options</small>
+    </div>
+
+</div>
+
+{% endif %}
+
+
+<!-- Paypal Javascript SDK -->
+
+<script src="https://www.paypal.com/sdk/js?client-id=test&currency=USD&disable-funding=card"></script>
+
+<!-- Payment via Paypal and submitting data to server -->
+
+<script type="text/javascript">
+    var total = "{{order.get_cart_total}}";
+
+    // Rendering the Paypal button inside a #paypal-button-container element
+
+    paypal
+        .Buttons({
+            // Styling the button
+
+            style: {
+                color: "blue",
+                shape: "rect",
+            },
+
+            // Parsing the cart value
+
+            createOrder: function (data, actions) {
+                return actions.order.create({
+                    purchase_units: [
+                        {
+                            amount: {
+                                value: parseFloat(total).toFixed(2), // Setting number of decimals to 2
+                            },
+                        },
+                    ],
+                });
+            },
+
+            // Finalizing the transaction and submitting data to the server
+
+            onApprove: function (data, actions) {
+                return actions.order.capture().then(function (orderData) {
+                    submitFormData();
+                });
+            },
+        })
+        .render("#paypal-button-container");
+
+    // Submitting checkout form data for registered and guest users
+
+    var form = document.getElementById("form");
+
+    csrftoken = form.getElementsByTagName("input")[0].value;
+
+    // After filling the form, proceed with the payment
+
+    form.addEventListener("submit", function (e) {
+        e.preventDefault();
+        document.getElementById("order-submit").classList.add("hidden");
+        document.getElementById("payment-info").classList.remove("hidden");
+    });
+
+    // If the user is registered, we already know their name and email and thus, the fields are irrelevant
+
+    function submitFormData() {
+        // Dictionary used for user data
+
+        var userFormData = {
+            name: null,
+            email: null,
+            total: total,
+        };
+
+        // Dictionary used for shipping adress
+
+        var userShippingInfo = {
+            address: null,
+            city: null,
+            county: null,
+            zipcode: null,
+        };
+
+        // If the user is registered, we already know their data
+
+        if (user == "AnonymousUser") {
+            userFormData.name = form.name.value;
+            userFormData.email = form.email.value;
+            userShippingInfo.address = form.address.value;
+            userShippingInfo.city = form.city.value;
+            userShippingInfo.county = form.county.value;
+            userShippingInfo.zipcode = form.zipcode.value;
+        }
+
+        // Sending data to the server
+
+        var url = "/process_order/";
+
+        fetch(url, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "X-CSRFToken": csrftoken,
+            },
+            body: JSON.stringify({
+                form: userFormData,
+                shipping: userShippingInfo,
+            }),
+        })
+            .then((response) => response.json())
+
+            .then((data) => {
+                cart = {};
+                document.cookie = "cart=" + JSON.stringify(cart) + ";domain=;path=/";
+
+                // Going back to main page after transaction
+
+                window.location.href = "{% url 'shop' %}";
+            });
+    }
+</script>
+
+{% endblock content%}

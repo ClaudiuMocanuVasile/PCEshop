@@ -1,0 +1,48 @@
+{% extends 'shop/main.html' %} {% load static %} {% block content %}
+
+<style>
+    footer {
+        display: none;
+    }
+
+    header {
+        display: none;
+    }
+</style>
+
+<form method="POST" action="" class="-mx-4 -mb-6">
+
+    {%csrf_token%}
+    <a class="absolute mt-5 bg-gray-200 text-center bg-gradient-to-r from-gray-700 via-blue-800 to-blue-900 hover:from-blue-900 hover:via-blue-700 hover:to-blue-900 text-white font-semibold px-6 py-3 rounded-md shadow-lg" href="{% url 'shop' %}">
+        &#x2190; Continue Shopping
+    </a>
+    <div class="min-h-screen bg-gray-200 text-gray-800 flex flex-col justify-center sm:py-12">
+
+        <div class="py-3 sm:max-w-xl mx-auto text-center">
+            <span class="text-2xl">Login</span>
+            <div class="mt-4 bg-white shadow-md sm:rounded-lg text-left">
+                <div class="h-2 bg-gradient-to-r from-gray-800 via-gray-800 to-blue-900 rounded-t-md"></div>
+                <div class="py-6 px-8 w-80">
+                    <label class="block font-semibold">Username</label>
+                    <input type="text" name="username" class="border w-full h-5 px-3 py-5 mt-2 hover:outline-none focus:outline-none focus:ring-1 focus:ring-blue-800 rounded-md shadow-md" />
+                    <label class="block mt-3 font-semibold">Password</label>
+                    <input type="password" name="password" class="border w-full h-5 px-3 py-5 mt-2 hover:outline-none focus:outline-none focus:ring-1 focus:ring-blue-800 rounded-md shadow-md" />
+                    
+                    {% for message in messages %}
+                        <p id="messages">{{message}}</p>
+                    {% endfor %}
+                    
+                    <div class="flex justify-between items-baseline">
+                        <button class="mt-4 py-2 px-6 bg-gradient-to-r from-gray-700 via-blue-800 to-blue-900 hover:from-blue-900 hover:via-blue-700 hover:to-blue-900 text-white font-semibold rounded-md shadow-lg">
+                            Login
+                        </button>
+                        <a href="{% url 'reset_password' %}" class="text-sm hover:underline">Forgot password?</a>
+                    </div>
+                </div>
+            </div>
+            <a href="{% url 'registration_page' %}" class="text-gray-500 text-sm hover:underline">Don't have an account? Register now</a>
+        </div>
+    </div>
+</form>
+
+{% endblock content %}
